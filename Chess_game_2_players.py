@@ -8,7 +8,7 @@ dep_square=(-1,-1)
 my_font = "{courier new} 50"
 my_font_2 = "{courier new} 20"
 
-# creating the chessboard
+# creating the chessboard (a 2 dimensionnal array)
 
 def N_empty_lines(n):
     return [Empty_line_of_n(8) for i in range(n)]
@@ -308,7 +308,7 @@ def checkmate(chessboard, turn):
         turn='black'
     return mate
 
-# function moving the pieces on the chessboard : players must click on a piece to move then click on the square they want to move it (if the square is not a possible move, player must re-click on the piece)
+# function moving the pieces on the chessboard : players must click on a piece to move then click on the square they want to move it (if the square is not a possible move, player must re-click on a piece he/she wants to move)
 
 def Move(lin, col):
     global dep_square, turn, fenetre
@@ -340,12 +340,16 @@ def Move(lin, col):
     else:
         dep_square=(-1,-1)
 
+#
+
 def image_square_color(i, j):
     color_piece=Chessboard[i][j][1]
     if color_piece=='white':
         image_white_square(i, j)
     else:
         image_black_square(i, j)
+
+# set the image for white pieces
 
 def image_white_square(i, j):
     piece_type=Chessboard[i][j][0]
@@ -363,6 +367,8 @@ def image_white_square(i, j):
     elif piece_type=='D':
         Board_dict[(i, j)].configure(text=u'\u2655')
 
+# set the images for black pieces
+
 def image_black_square(i, j):
     piece_type=Chessboard[i][j][0]
     if piece_type=='P':
@@ -377,6 +383,8 @@ def image_black_square(i, j):
         Board_dict[(i, j)].configure(text=u'\u265A')
     elif piece_type=='D':
         Board_dict[(i, j)].configure(text=u'\u265B')
+
+# function showing the chessboard
 
 def show_chessboard():
     global root, Board_dict, fenetre
@@ -396,6 +404,8 @@ def show_chessboard():
 def All_fenetre_destroy():
     fenetre.destroy()
     root.destroy()
+
+# setting the parameters to display the chessboard
 
 root=Tk()
 fenetre=Toplevel()
