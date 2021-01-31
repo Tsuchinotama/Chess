@@ -1,6 +1,6 @@
 from tkinter import *
 
-# creating the parameters (each square of te chessboard will be stocked in a dictionnary)
+# creating the parameters (each square of the chessboard will be stocked in a dictionnary)
 
 turn='white'
 Board_dict={}
@@ -30,7 +30,6 @@ dep_chessboard=[Black_pieces_line, Black_pawns_line] + N_empty_lines(4) + [White
 
 Chessboard=dep_chessboard
 
-
 # function returning all the possible moves of a piece based on the type of piece (including moves that would bring to a self-check)
 
 def Piece_moves(Chessboard, dep_pos):
@@ -56,26 +55,29 @@ def Pawn_moves(Chessboard, dep_pos):
     possible_moves=[]
     lin=dep_pos[0]
     col=dep_pos[1]
-    if Chessboard[lin][col][1]=='white':
-        if lin>0:
-            if Chessboard[lin-1][col]==[' ',' ']:
-                if lin==6 and Chessboard[lin-2][col]==[' ',' ']:
-                    possible_moves.append((lin-2,col))
-                possible_moves.append((lin-1,col))
-            if (col>0) and Chessboard[lin-1][col-1][1]=='black':
-                    possible_moves.append((lin-1,col-1))
-            if (col<7) and Chessboard[lin-1][col+1][1]=='black':
-                    possible_moves.append((lin-1,col+1))
-    else:
-        if lin<7:
-            if Chessboard[lin+1][col]==[' ',' ']:
-                if lin==1 and Chessboard[lin+2][col]==[' ',' ']:
-                    possible_moves.append((lin+2,col))
-                possible_moves.append((lin+1,col))
-            if (col>0) and Chessboard[lin+1][col-1][1]=='white':
-                possible_moves.append((lin+1,col+1))
-            if (col<7) and Chessboard[lin+1][col+1][1]=='white':
-                possible_moves.append((lin+1,col+1))
+    # White pawn not on the opposite side of the board
+    if Chessboard[lin][col][1]=='white' and lin>0:
+        if Chessboard[lin-1][col]==[' ',' ']:
+            possible_moves.append((lin-1,col))
+            # Pawn at his original position can move 2 squares forward
+            if lin==6 and Chessboard[lin-2][col]==[' ',' ']:
+                possible_moves.append((lin-2,col))
+        # Check for ennemy piece in diagonal
+        if (col>0) and Chessboard[lin-1][col-1][1]=='black':
+                possible_moves.append((lin-1,col-1))
+        if (col<7) and Chessboard[lin-1][col+1][1]=='black':
+                possible_moves.append((lin-1,col+1))
+
+    # White pawn not on the opposite side of the board
+    elif lin<7:
+        if Chessboard[lin+1][col]==[' ',' ']:
+            possible_moves.append((lin+1,col))
+            if lin==1 and Chessboard[lin+2][col]==[' ',' ']:
+                possible_moves.append((lin+2,col))
+        if (col>0) and Chessboard[lin+1][col-1][1]=='white':
+            possible_moves.append((lin+1,col+1))
+        if (col<7) and Chessboard[lin+1][col+1][1]=='white':
+            possible_moves.append((lin+1,col+1))
     return possible_moves
 
 # function returning all the possible moves of a rook
@@ -84,24 +86,33 @@ def Rook_moves(Chessboard, dep_pos):
     possible_moves=[]
     lin=dep_pos[0]
     col=dep_pos[1]
+
+    # Check all the squares reachable under (resp. up, left and right) the rook
+
+    # add all the free squares under (resp. up, left and right) the rook
     lin_minus=lin
     while lin_minus>0 and Chessboard[lin_minus-1][col][1]==' ':
         possible_moves.append((lin_minus-1,col))
         lin_minus=lin_minus-1
+    # check if the first not free square under (resp. up, left and right)
+    # the rook is occupied with an ennemy piece
     if lin_minus>0 and Chessboard[lin_minus-1][col][1]!=Chessboard[lin][col][1]:
         possible_moves.append((lin_minus-1,col))
+
     lin_plus=lin
     while lin_plus<7 and Chessboard[lin_plus+1][col][1]==' ':
         possible_moves.append((lin_plus+1,col))
         lin_plus=lin_plus+1
     if lin_plus>0 and Chessboard[lin_plus-1][col][1]!=Chessboard[lin][col][1]:
         possible_moves.append((lin_plus-1,col))
+
     col_minus=col
     while col_minus>0 and Chessboard[lin][col_minus-1][1]==' ':
         possible_moves.append((lin,col_minus-1))
         col_minus=col_minus-1
     if col_minus>0 and Chessboard[lin][col_minus-1][1]!=Chessboard[lin][col][1]:
         possible_moves.append((lin,col_minus-1))
+
     col_plus=col
     while col_plus<7 and Chessboard[lin][col_plus+1][1]==' ':
         possible_moves.append((lin,col_plus+1))
@@ -116,14 +127,23 @@ def Bishop_moves(Chessboard, dep_pos):
     possible_moves=[]
     lin=dep_pos[0]
     col=dep_pos[1]
+
+    # Check all the squares reachable under (resp. up, left and right) the bishop
+
+    # add all the free squares North-West/Up-Left 
+    # (resp. North-East/Up-Right, South-East/Down-Right and South-West/Down-Left) the bishop
     lin_NW=lin
     col_NW=col
     while lin_NW>0 and col_NW>0 and Chessboard[lin_NW-1][col_NW-1][1]==' ':
         possible_moves.append((lin_NW-1,col_NW-1))
         lin_NW=lin_NW-1
         col_NW=col_NW-1
+    # check if the first not free square under North-West/Up-Left 
+    # (resp. North-East/Up-Right, South-East/Down-Right and South-West/Down-Left)
+    #  the bishop is occupied with an ennemy piece
     if lin_NW>0 and col_NW>0 and Chessboard[lin_NW-1][col_NW-1][1]!=Chessboard[lin][col][1]:
         possible_moves.append((lin_NW-1,col_NW-1))
+
     lin_NE=lin
     col_NE=col
     while lin_NE>0 and col_NE<7 and Chessboard[lin_NE-1][col_NE+1][1]==' ':
@@ -132,6 +152,7 @@ def Bishop_moves(Chessboard, dep_pos):
         col_NE=col_NE+1
     if lin_NE>0 and col_NE<7 and Chessboard[lin_NE-1][col_NE+1][1]!=Chessboard[lin][col][1]:
         possible_moves.append((lin_NE-1,col_NE+1))
+
     lin_SE=lin
     col_SE=col
     while lin_SE<7 and col_SE<7 and Chessboard[lin_SE+1][col_SE+1][1]==' ':
@@ -140,6 +161,7 @@ def Bishop_moves(Chessboard, dep_pos):
         col_SE=col_SE+1
     if lin_SE<7 and col_SE<7 and Chessboard[lin_SE+1][col_SE+1][1]!=Chessboard[lin][col][1]:
         possible_moves.append((lin_SE+1,col_SE+1))
+
     lin_SW=lin
     col_SW=col
     while lin_SW<7 and col_SW>0 and Chessboard[lin_SW+1][col_SW-1][1]==' ':
@@ -148,13 +170,14 @@ def Bishop_moves(Chessboard, dep_pos):
         col_SW=col_SW-1
     if lin_SW<7 and col_SW>0 and Chessboard[lin_SW+1][col_SW-1][1]!=Chessboard[lin][col][1]:
         possible_moves.append((lin_SW+1,col_SW-1))
+
     return possible_moves
 
 # function returning all the possible moves of a queen
 
 def Queen_moves(Chessboard, dep_pos):
-    Mouvs_dame=Bishop_moves(Chessboard, dep_pos)
-    Mouvs_dame.extend(pos for pos in Rook_moves(Chessboard, dep_pos) if not pos in Mouvs_dame)
+    # Mouvs_dame=Bishop_moves(Chessboard, dep_pos)
+    # Mouvs_dame.extend(pos for pos in Rook_moves(Chessboard, dep_pos) if not pos in Mouvs_dame)
     return Bishop_moves(Chessboard, dep_pos) + Rook_moves(Chessboard, dep_pos)
 
 # function returning all the possible moves of a knight
@@ -166,7 +189,8 @@ def Knight_moves(Chessboard, dep_pos):
     lin=dep_pos[0]
     col=dep_pos[1]
     for mov in Knight_all_moves:
-        if lin+mov[0]>-1 and lin+mov[0]<8 and col+mov[1]>-1 and col+mov[1]<8 and Chessboard[lin+mov[0]][col+mov[1]][1]!=Chessboard[lin][col][1]:
+        if (lin+mov[0]>-1 and lin+mov[0]<8 and col+mov[1]>-1 and col+mov[1]<8
+            and Chessboard[lin+mov[0]][col+mov[1]][1]!=Chessboard[lin][col][1]):
             possible_moves.append((lin+mov[0],col+mov[1]))
     return possible_moves
 
@@ -181,7 +205,8 @@ def King_moves(Chessboard, dep_pos):
     for mov in King_all_moves:
         arr_lin=lin+mov[0]
         arr_col=col+mov[1]
-        if arr_lin<8 and arr_lin>-1 and arr_col<8 and arr_col>-1 and Chessboard[arr_lin][arr_col][1]!=Chessboard[lin][col][1]:
+        if (arr_lin<8 and arr_lin>-1 and arr_col<8 and arr_col>-1 and
+            Chessboard[arr_lin][arr_col][1]!=Chessboard[lin][col][1]):
             possible_moves.append((arr_lin,arr_col))
     return possible_moves
 
@@ -210,6 +235,7 @@ def check(chessboard, turn):
                                 self_check=True
                             else:
                                 VS_check=True
+                                
                 elif test_square[0]=='F':
                     for arr_pos in Bishop_moves(chessboard, (i,j)):
                         arr_square=chessboard[arr_pos[0]][arr_pos[1]]
@@ -218,6 +244,7 @@ def check(chessboard, turn):
                                 self_check=True
                             else:
                                 VS_check=True
+
                 elif test_square[0]=='D':
                     for arr_pos in Queen_moves(chessboard, (i,j)):
                         arr_square=chessboard[arr_pos[0]][arr_pos[1]]
@@ -226,25 +253,25 @@ def check(chessboard, turn):
                                 self_check=True
                             else:
                                 VS_check=True
+
                 elif test_square[0]=='P':
                     if test_square[1]=='white':
-                        if i>0 and j>0 and chessboard[i-1][j-1][0]=='R' and chessboard[i-1][j-1][1]!=test_square[1]:
+                        if (i>0 and 
+                            (j>0 and chessboard[i-1][j-1][0]=='R' and
+                            chessboard[i-1][j-1][1]!=test_square[1]) or 
+                            (j<7 and chessboard[i-1][j+1][0]=='R'
+                            and chessboard[i-1][j+1][1]!=test_square[1])):
                             if test_square[1]!=turn:
                                 self_check=True
                             else:
                                 VS_check=True
-                        elif i>0 and j<7 and chessboard[i-1][j+1][0]=='R' and chessboard[i-1][j+1][1]!=test_square[1]:
-                            if test_square[1]!=turn:
-                                self_check=True
-                            else:
-                                VS_check=True
+
                     else:
-                        if i<7 and j>0 and chessboard[i+1][j-1][0]=='R' and chessboard[i+1][j-1][1]!=test_square[1]:
-                            if test_square[1]!=turn:
-                                self_check=True
-                            else:
-                                VS_check=True
-                        elif i<7 and j<7 and chessboard[i+1][j+1][0]=='R' and chessboard[i+1][j+1][1]!=test_square[1]:
+                        if (i<7 and
+                            (j>0 and chessboard[i+1][j-1][0]=='R' and
+                            chessboard[i+1][j-1][1]!=test_square[1]) or
+                            (j<7 and chessboard[i+1][j+1][0]=='R'
+                            and chessboard[i+1][j+1][1]!=test_square[1])):
                             if test_square[1]!=turn:
                                 self_check=True
                             else:
@@ -308,7 +335,8 @@ def checkmate(chessboard, turn):
         turn='black'
     return mate
 
-# function moving the pieces on the chessboard : players must click on a piece to move then click on the square they want to move it (if the square is not a possible move, player must re-click on a piece he/she wants to move)
+# function moving the pieces on the chessboard : players must click on a piece to move then click on the square they want to move it
+# (if the square is not a possible move, player must re-click on a piece he/she wants to move)
 
 def Move(lin, col):
     global dep_square, turn, fenetre
@@ -339,8 +367,6 @@ def Move(lin, col):
             Indicate_turn.configure(text='%s player turn' % turn)
     else:
         dep_square=(-1,-1)
-
-#
 
 def image_square_color(i, j):
     color_piece=Chessboard[i][j][1]
@@ -419,14 +445,3 @@ Escape.place(x=200, y=650)
 show_chessboard()
 
 root.mainloop()
-
-
-
-
-
-
-
-
-
-
-
